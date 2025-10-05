@@ -10,7 +10,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-typedef unsigned char Byte; // ±ðÓÃ 'byte'£¬±ÜÃâºÍ std::byte ³åÍ»
+typedef unsigned char Byte; // åˆ«ç”¨ 'byte'ï¼Œé¿å…å’Œ std::byte å†²çª
 
 // ---- S-box / inverse S-box ----
 static const Byte S_BOX[256] = {
@@ -55,8 +55,8 @@ static const Byte INV_S_BOX[256] = {
 static const Byte RCON[10] = {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1B,0x36};
 
 // ---- helpers ----
-// ÔÚ AES ÖÐ£¬×´Ì¬°´ÁÐÓÅÏÈ´æ´¢£ºstate[row][col]
-// ´òÓ¡ state ¾ØÕó£¬±ãÓÚ¶ÔÕÕ½Ì²Ä£¨16 ×Ö½Ú -> 4x4£©
+// åœ¨ AES ä¸­ï¼ŒçŠ¶æ€æŒ‰åˆ—ä¼˜å…ˆå­˜å‚¨ï¼šstate[row][col]
+// æ‰“å° state çŸ©é˜µï¼Œä¾¿äºŽå¯¹ç…§æ•™æï¼ˆ16 å­—èŠ‚ -> 4x4ï¼‰
 void print_state(const Byte state[4][4]) {
     cout << " state (rows 0..3, cols 0..3):\n";
     for (int r = 0; r < 4; ++r) {
@@ -68,7 +68,7 @@ void print_state(const Byte state[4][4]) {
     }
 }
 
-// GF(2^8) ³Ë·¨
+// GF(2^8) ä¹˜æ³•
 Byte gmul(Byte a, Byte b) {
     Byte p = 0;
     for (int i = 0; i < 8; ++i) {
@@ -81,7 +81,7 @@ Byte gmul(Byte a, Byte b) {
     return p;
 }
 
-// AddRoundKey£ºroundKey Îª 16 ×Ö½Ú£¨ÁÐÖ÷Ðò£©
+// AddRoundKeyï¼šroundKey ä¸º 16 å­—èŠ‚ï¼ˆåˆ—ä¸»åºï¼‰
 void AddRoundKey(Byte state[4][4], const Byte roundKey[16]) {
     for (int c = 0; c < 4; ++c) {
         for (int r = 0; r < 4; ++r) {
@@ -139,10 +139,10 @@ void InvMixColumns(Byte state[4][4]) {
     }
 }
 
-// KeyExpansion: ÊäÈë 16 ×Ö½Ú key£¨×Ö½Ú°´ÐÐÊäÈë£¬ÀýÈç ASCII ×Ö·û´®£©£¬Êä³ö 176 ×Ö½ÚÂÖÃÜÔ¿
-// roundKeys: ³¤¶ÈÖÁÉÙ176
+// KeyExpansion: è¾“å…¥ 16 å­—èŠ‚ keyï¼ˆå­—èŠ‚æŒ‰è¡Œè¾“å…¥ï¼Œä¾‹å¦‚ ASCII å­—ç¬¦ä¸²ï¼‰ï¼Œè¾“å‡º 176 å­—èŠ‚è½®å¯†é’¥
+// roundKeys: é•¿åº¦è‡³å°‘176
 void KeyExpansion(const Byte key[16], Byte roundKeys[176]) {
-    // Ç° 16 ×Ö½ÚÖ±½ÓÊÇÃÜÔ¿
+    // å‰ 16 å­—èŠ‚ç›´æŽ¥æ˜¯å¯†é’¥
     for (int i=0;i<16;++i) roundKeys[i] = key[i];
 
     int bytesGenerated = 16;
@@ -171,9 +171,9 @@ void KeyExpansion(const Byte key[16], Byte roundKeys[176]) {
     }
 }
 
-// AES µ¥¿é¼ÓÃÜ£¨16 ×Ö½Ú£©¡ª¡ªverbose ¿ØÖÆÊÇ·ñ´òÓ¡ÖðÂÖ×´Ì¬
+// AES å•å—åŠ å¯†ï¼ˆ16 å­—èŠ‚ï¼‰â€”â€”verbose æŽ§åˆ¶æ˜¯å¦æ‰“å°é€è½®çŠ¶æ€
 void AES_EncryptBlock(Byte inOut[16], const Byte roundKeys[176], bool verbose=false) {
-    // ½«ÊäÈë×°Èë state£¨ÁÐÖ÷Ðò£©
+    // å°†è¾“å…¥è£…å…¥ stateï¼ˆåˆ—ä¸»åºï¼‰
     Byte state[4][4];
     for (int i=0;i<16;++i) state[i%4][i/4] = inOut[i];
 
@@ -182,11 +182,11 @@ void AES_EncryptBlock(Byte inOut[16], const Byte roundKeys[176], bool verbose=fa
         print_state(state);
     }
 
-    // ³õÊ¼ÂÖ
+    // åˆå§‹è½®
     AddRoundKey(state, roundKeys);
     if (verbose) { cout << "\nAfter AddRoundKey (round 0):\n"; print_state(state); }
 
-    // 9 ÂÖ±ê×¼ÂÖ
+    // 9 è½®æ ‡å‡†è½®
     for (int round=1; round<=9; ++round) {
         SubBytes(state);
         if (verbose) { cout << "\nAfter SubBytes (round " << round << "):\n"; print_state(state); }
@@ -198,7 +198,7 @@ void AES_EncryptBlock(Byte inOut[16], const Byte roundKeys[176], bool verbose=fa
         if (verbose) { cout << "\nAfter AddRoundKey (round " << round << "):\n"; print_state(state); }
     }
 
-    // ×îºóÒ»ÂÖ£¨²»º¬ MixColumns£©
+    // æœ€åŽä¸€è½®ï¼ˆä¸å« MixColumnsï¼‰
     SubBytes(state);
     if (verbose) { cout << "\nAfter SubBytes (round 10):\n"; print_state(state); }
     ShiftRows(state);
@@ -206,11 +206,11 @@ void AES_EncryptBlock(Byte inOut[16], const Byte roundKeys[176], bool verbose=fa
     AddRoundKey(state, roundKeys + 160);
     if (verbose) { cout << "\nAfter AddRoundKey (round 10):\n"; print_state(state); cout << "=== End Encryption ===\n"; }
 
-    // Ð´»Ø
+    // å†™å›ž
     for (int i=0;i<16;++i) inOut[i] = state[i%4][i/4];
 }
 
-// AES µ¥¿é½âÃÜ£¨16 ×Ö½Ú£©
+// AES å•å—è§£å¯†ï¼ˆ16 å­—èŠ‚ï¼‰
 void AES_DecryptBlock(Byte inOut[16], const Byte roundKeys[176], bool verbose=false) {
     Byte state[4][4];
     for (int i=0;i<16;++i) state[i%4][i/4] = inOut[i];
@@ -220,17 +220,17 @@ void AES_DecryptBlock(Byte inOut[16], const Byte roundKeys[176], bool verbose=fa
         print_state(state);
     }
 
-    // ³õÊ¼ÂÖ: addRoundKey with last
+    // åˆå§‹è½®: addRoundKey with last
     AddRoundKey(state, roundKeys + 160);
     if (verbose) { cout << "\nAfter AddRoundKey (round 10):\n"; print_state(state); }
 
-    // ×îºóÒ»ÂÖÄæ£¨Ã»ÓÐ InvMixColumns£©
+    // æœ€åŽä¸€è½®é€†ï¼ˆæ²¡æœ‰ InvMixColumnsï¼‰
     InvShiftRows(state);
     if (verbose) { cout << "\nAfter InvShiftRows (round 10):\n"; print_state(state); }
     InvSubBytes(state);
     if (verbose) { cout << "\nAfter InvSubBytes (round 10):\n"; print_state(state); }
 
-    // 9 ÂÖÄæ
+    // 9 è½®é€†
     for (int round=9; round>=1; --round) {
         AddRoundKey(state, roundKeys + 16*round);
         if (verbose) { cout << "\nAfter AddRoundKey (round " << round << "):\n"; print_state(state); }
@@ -242,14 +242,14 @@ void AES_DecryptBlock(Byte inOut[16], const Byte roundKeys[176], bool verbose=fa
         if (verbose) { cout << "\nAfter InvSubBytes (round " << round << "):\n"; print_state(state); }
     }
 
-    // ³õÊ¼ÂÖÄæ
+    // åˆå§‹è½®é€†
     AddRoundKey(state, roundKeys);
     if (verbose) { cout << "\nAfter AddRoundKey (round 0):\n"; print_state(state); cout << "=== End Decryption ===\n"; }
 
     for (int i=0;i<16;++i) inOut[i] = state[i%4][i/4];
 }
 
-// ¸¨Öú´òÓ¡ 16 ×Ö½ÚÊý×éÎª HEX
+// è¾…åŠ©æ‰“å° 16 å­—èŠ‚æ•°ç»„ä¸º HEX
 void print_hex16(const Byte b[16]) {
     for (int i=0;i<16;++i) {
         cout << std::hex << std::setw(2) << std::setfill('0') << (int)b[i];
@@ -258,15 +258,15 @@ void print_hex16(const Byte b[16]) {
 }
 
 int main() {
-    cout << "AES-128 ½ÌÑ§°æ£¨ÖðÂÖÏÔÊ¾£©\n\n";
+    cout << "AES-128 æ•™å­¦ç‰ˆï¼ˆé€è½®æ˜¾ç¤ºï¼‰\n\n";
 
     string plain, key;
-    cout << "ÊäÈëÃ÷ÎÄ£¨¿ÉÉÙÓÚ16×Ö½Ú£¬³ÌÐò»áÓÃ¿Õ¸ñ²¹Æë£©: ";
+    cout << "è¾“å…¥æ˜Žæ–‡ï¼ˆå¯å°‘äºŽ16å­—èŠ‚ï¼Œç¨‹åºä¼šç”¨ç©ºæ ¼è¡¥é½ï¼‰: ";
     std::getline(cin, plain);
-    cout << "ÊäÈëÃÜÔ¿£¨¿ÉÉÙÓÚ16×Ö½Ú£¬³ÌÐò»áÓÃ¿Õ¸ñ²¹Æë£©: ";
+    cout << "è¾“å…¥å¯†é’¥ï¼ˆå¯å°‘äºŽ16å­—èŠ‚ï¼Œç¨‹åºä¼šç”¨ç©ºæ ¼è¡¥é½ï¼‰: ";
     std::getline(cin, key);
 
-    // Ìî³äÖÁ 16 ×Ö½Ú£¨½ÌÑ§·½±ã£©
+    // å¡«å……è‡³ 16 å­—èŠ‚ï¼ˆæ•™å­¦æ–¹ä¾¿ï¼‰
     if (plain.size() < 16) plain.append(16 - plain.size(), ' ');
     if (key.size() < 16) key.append(16 - key.size(), ' ');
 
@@ -279,14 +279,14 @@ int main() {
     Byte roundKeys[176];
     KeyExpansion(k, roundKeys);
 
-    cout << "\n-- ¿ªÊ¼¼ÓÃÜ£¨ÖðÂÖ´òÓ¡£© --\n";
+    cout << "\n-- å¼€å§‹åŠ å¯†ï¼ˆé€è½®æ‰“å°ï¼‰ --\n";
     AES_EncryptBlock(in, roundKeys, true);
 
     cout << "\nCipher (hex): ";
     print_hex16(in);
 
-    // ½âÃÜ»ØÈ¥£¬ÑéÖ¤
-    cout << "\n-- ¿ªÊ¼½âÃÜ£¨ÖðÂÖ´òÓ¡£© --\n";
+    // è§£å¯†å›žåŽ»ï¼ŒéªŒè¯
+    cout << "\n-- å¼€å§‹è§£å¯†ï¼ˆé€è½®æ‰“å°ï¼‰ --\n";
     Byte cipher[16];
     memcpy(cipher, in, 16);
     AES_DecryptBlock(cipher, roundKeys, true);
